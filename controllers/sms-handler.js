@@ -149,7 +149,7 @@ var decideResponse = function(conversation, lastMessage, messageReceived, callba
                         remediation.timeStamp + ' by providing us with the following information. ' +
 
                         'Please respond with this information here: http://' +
-                        (process.env.APP_HOST || 'localhost:3000') + '/remediation-actions/' +
+                        (process.env.APP_HOST || 'localhost:3000') + '/remediation-actions-form/' +
                             remediation.referenceId
                     );
 

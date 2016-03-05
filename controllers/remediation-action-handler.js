@@ -20,7 +20,7 @@ var RemediationFile = mongoose.model('RemediationFile', {
 
 module.exports.map = function(app) {
 
-    app.get('/remediation-actions/:referenceId', function(req, resp) {
+    app.get('/remediation-actions-form/:referenceId', function(req, resp) {
 
         resp.render('layouts/remediation-actions',  {
             referenceId: req.params.referenceId
@@ -41,7 +41,16 @@ module.exports.map = function(app) {
                     file: remediationFile._id
                 }).save();
 
-                resp.end();
+                resp.render('layouts/thank-you');
+            });
+    });
+
+    app.get('/remediation-actions/:referenceId', function(req, resp) {
+
+        RemediationAction.findOne({referenceId: req.params.referenceId},
+            function(error, remediatonAction) {
+
+                resp.send(remediatonAction);
             });
     });
 
