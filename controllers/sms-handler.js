@@ -51,8 +51,8 @@ module.exports = function(req, resp) {
                 } else {
 
                     twiml.message('The court has no record of this citation. ' +
-                        'We will text you back when citation: "' + messageReceived +
-                        '" has been received. {Legal Disclaimer}');
+                        'We will text you back if citation: "' + messageReceived +
+                        '" is received later. {Legal Disclaimer}');
                     resp.send(twiml.toString());
                 }
 

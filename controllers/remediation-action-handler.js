@@ -52,6 +52,9 @@ module.exports.map = function(app) {
                 remediations.findByReferenceId(req.params.referenceId,
                     function(remediation) {
 
+                        remediation.status = 'actioned';
+                        remediation.save();
+
                         conversations.findByCitationNumber(remediation.citationNumber,
                             function(conversation) {
 
