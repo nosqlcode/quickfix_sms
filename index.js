@@ -3,8 +3,6 @@ var app = express();
 
 var bodyParser = require('body-parser');
 
-var twilio = require('twilio');
-
 var mongoose = require('mongoose');
 mongoose.connect(process.env.MONGOLAB_URI || 'mongodb://localhost/test');
 
