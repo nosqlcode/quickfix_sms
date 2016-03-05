@@ -9,7 +9,7 @@ var RemediationAction = mongoose.model('RemediationAction', {
 
 module.exports.map = function(app) {
 
-    app.post('/rememdiation-actions/referenceId',
+    app.post('/remediation-actions/referenceId',
         function(req, resp) {
 
         new RemediationAction({

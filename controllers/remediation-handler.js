@@ -16,7 +16,7 @@ module.exports.map = function(app) {
         });
     });
 
-    app.patch('/remediation/:id', function(req, resp) {
+    app.patch('/remediations/:id', function(req, resp) {
 
         Remediation.findByIdAndUpdate(req.params.id, {$set: req.body}, {},
             function(error, effected) {
