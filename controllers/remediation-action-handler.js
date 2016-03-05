@@ -5,6 +5,8 @@ var upload = multer({storage: multer.memoryStorage()});
 var remediations = require('../service/remediations');
 var conversations = require('../service/conversations');
 
+var insuranceProviders = require('../service/insurance-providers');
+
 var sms = require('../service/sms');
 
 var mongoose = require('mongoose');
@@ -53,9 +55,13 @@ module.exports.map = function(app) {
                         conversations.findByCitationNumber(remediation.citationNumber,
                             function(conversation) {
 
-                                sms.send(conversation.from, remediation.insuranceProvider +
-                                    ' has sent us information related to your citation. ' +
-                                    'This information will be under review by the courts.')
+                                insuranceProviders.findById(id, function(provider) {
+
+                                    sms.send(conversation.from, provider.name +
+                                        ' has sent us information related to your citation. ' +
+                                        'This information will be under review by the courts.');
+                                });
+
                             });
                     });
             });
