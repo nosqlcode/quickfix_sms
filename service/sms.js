@@ -7,7 +7,7 @@ module.exports.send = function(to, message) {
     client.messages.create({
         to: to,
         from: '2015618112',
-        body: message,
+        body: message
     }, function(err, message) {
         console.log(message.sid);
     });

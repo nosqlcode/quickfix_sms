@@ -28,7 +28,7 @@ module.exports = function(req, resp) {
                 if (citation) {
 
                     var response = 'your case number: ' +
-                        req.body.Body + ' has "no proof of insurance, "' +
+                        req.body.Body + ' has "no proof of insurance", ' +
                         'do you have insurance? y/n';
 
                     remediationService.save({
@@ -113,7 +113,8 @@ var decideResponse = function(conversation, lastMessage, messageReceived, callba
 
         });
 
-    } else if(contains(lastMessage, 'Please select from the following:')) {
+    } else if(contains(lastMessage, 'Please select from the following:') ||
+        contains('was not a valid option')) {
 
         var selection = Number(messageReceived);
 
