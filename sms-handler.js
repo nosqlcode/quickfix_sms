@@ -16,6 +16,9 @@ var citations = require('./citations');
 var insuranceProviders = require('./insurance-providers');
 
 
+var emails = require('./emails');
+
+
 module.exports = function(req, resp) {
 
     var twiml = new twilio.TwimlResponse();
@@ -116,6 +119,13 @@ var decideResponse = function(conversation, lastMessage, messageReceived, callba
 
         var selection = Number(messageReceived);
         var provider = conversation.providerOptions[selection - 1];
+
+        emails.send('Request for proof of insurance C100000033',
+            'First Last Name (DL: 85746303) received a citation and did ' +
+            'not have proof of Insurance while driving Plate Number ACD 123.  ' +
+            'Defendant is claiming coverage under Allstate.  ' +
+            'Please confirm whether First Last Name was covered on ' +
+            'mm/dd/yy by providing us with the following information.');
 
         callback('We have sent a request for your auto insurance ' +
             'coverage information to: ' + provider);

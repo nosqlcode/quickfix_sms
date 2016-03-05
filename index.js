@@ -1,13 +1,14 @@
-var express = require('express');
-var app = express();
+var app = require('express')();
 
-var bodyParser = require('body-parser');
 
 var mongoose = require('mongoose');
 mongoose.connect(process.env.MONGOLAB_URI || 'mongodb://localhost/test');
 
 
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(require('cors')());
+
+
+app.use(require('body-parser').urlencoded({extended: true}));
 
 
 app.post('/sms', require('./sms-handler'));
