@@ -7,16 +7,20 @@ var mongoose = require('mongoose');
 var Conversation = mongoose.model('Conversation',
     {
         from: String,
-        caseNumber: String,
+        citationNumber: String,
         messages: Array,
-        providerOptions: Array
+        providerOptions: Array,
+        remediation: String
     });
 
-var citations = require('./citations');
-var insuranceProviders = require('./insurance-providers');
+var citations = require('./../service/citations');
+var insuranceProviders = require('./../service/insurance-providers');
 
 
-var emails = require('./emails');
+var remediationService = require('../service/remediation-service');
+
+
+var emails = require('./../service/emails');
 
 
 module.exports = function(req, resp) {
@@ -37,16 +41,23 @@ module.exports = function(req, resp) {
                         req.body.Body + ' has "no proof of insurance, "' +
                         'do you have insurance? y/n';
 
-                    var conversation = new Conversation({
-                        from: req.body.From,
-                        caseNumber: Number(messageReceived),
-                        messages: [messageReceived, response]
+                    remediationService.save({
+                        citationNumber: messageReceived,
+                        type: 'insurance',
+                        defendant: citation.lastName + ', ' + citation.firstName
+                    }, function(remediation) {
+
+                        new Conversation({
+                            from: req.body.From,
+                            citationNumber: messageReceived,
+                            messages: [messageReceived, response],
+                            remediation: remediation._id
+                        }).save();
+
+                        twiml.message(response);
+                        resp.send(twiml.toString());
                     });
 
-                    conversation.save();
-
-                    twiml.message(response);
-                    resp.send(twiml.toString());
                 } else {
 
                     twiml.message('The court has no record of this citation. ' +
@@ -94,7 +105,7 @@ var decideResponse = function(conversation, lastMessage, messageReceived, callba
         }
     } else if(contains(lastMessage, 'first three letters')) {
 
-        insuranceProviders.findProvider(messageReceived, function(providers) {
+        insuranceProviders.findProviders(messageReceived, function(providers) {
 
             if (providers.length > 0) {
 
@@ -118,17 +129,36 @@ var decideResponse = function(conversation, lastMessage, messageReceived, callba
     } else if(contains(lastMessage, 'Please select from the following:')) {
 
         var selection = Number(messageReceived);
-        var provider = conversation.providerOptions[selection - 1];
+        var providerName = conversation.providerOptions[selection - 1];
 
-        emails.send('Request for proof of insurance C100000033',
-            'First Last Name (DL: 85746303) received a citation and did ' +
-            'not have proof of Insurance while driving Plate Number ACD 123.  ' +
-            'Defendant is claiming coverage under Allstate.  ' +
-            'Please confirm whether First Last Name was covered on ' +
-            'mm/dd/yy by providing us with the following information.');
+        insuranceProviders.findProviderByName(providerName, function(provider) {
 
-        callback('We have sent a request for your auto insurance ' +
-            'coverage information to: ' + provider);
+            remediationService.findById(conversation.remediation,
+                function(remediation) {
+
+                    remediation.insuranceProvider = provider._id;
+                    remediation.save();
+
+                    emails.send(provider.email,
+                        'Request for proof of insurance ' + remediation.citationNumber,
+
+                        remediation.defendant + ' (DL: 85746303) received a citation and did ' +
+                        'not have proof of Insurance while driving Plate Number ACD 123.  ' +
+                        'Defendant is claiming coverage under ' + providerName + '.  ' +
+                        'Please confirm whether ' + remediation.defendant + ' was covered on ' +
+                        remediation.timeStamp + ' by providing us with the following information. ' +
+
+                        'Please respond with this information here: http://' +
+                        (process.env.APP_HOST || 'localhost:3000') + '/remediation-actions/' +
+                            remediation.referenceId
+                    );
+
+                    callback('We have sent a request for your auto insurance ' +
+                        'coverage information to: ' + providerName);
+                });
+
+        });
+
     } else {
 
         callback('not sure what to do....');

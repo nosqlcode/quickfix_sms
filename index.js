@@ -11,34 +11,10 @@ app.use(require('cors')());
 app.use(require('body-parser').urlencoded({extended: true}));
 
 
-app.post('/sms', require('./sms-handler'));
+app.post('/sms', require('./controllers/sms-handler'));
 
-
-var Correction = mongoose.model('Correction', {
-    citationNumber: String,
-    defendant: String,
-    type: String,
-    fee: Number,
-    timeStamp: Date,
-    insuranceProvider: String,
-    file: String,
-    message: String
-});
-
-app.get('/corrections', function(req, resp) {
-
-    var page = req.query.page || 1;
-    var perPage = req.query.perPage || 10;
-
-    var skip = perPage * (page - 1);
-
-    Correction.find({}, null,
-        {skip: skip, limit: perPage, sort: {timeStamp: 1}},
-        function(error, corrections) {
-
-        resp.send(corrections);
-    });
-});
+require('./controllers/remediation-file-handler').map(app);
+require('./controllers/remediation-handler').map(app);
 
 
 var port = process.env.PORT || 3000;

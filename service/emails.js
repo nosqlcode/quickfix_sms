@@ -2,10 +2,10 @@
 var sendgrid  = require('sendgrid')(process.env.SENDGRID_USERNAME,
     process.env.SENDGRID_PASSWORD);
 
-module.exports.send = function(subject, body) {
+module.exports.send = function(to, subject, body) {
 
     sendgrid.send({
-        to:       'thomas@nosqlcode.com',
+        to:       to,
         from:     'mtvanguard@gmail.com',
         subject:  subject,
         text:     body
