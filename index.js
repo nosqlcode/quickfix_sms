@@ -15,4 +15,7 @@ app.use(bodyParser.json());
 app.post('/sms', require('./sms-handler'));
 
 
-app.listen(process.env.PORT || 3000);
+var port = process.env.PORT || 3000;
+app.listen(port, function() {
+    console.log('listening on: ' + port);
+});
