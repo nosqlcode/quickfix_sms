@@ -45,3 +45,20 @@ module.exports.findById = function(id, callback) {
         callback(remediation);
     });
 };
+
+module.exports.findByReferenceId = function(referenceId, callback) {
+
+    Remediation.findOne({referenceId: referenceId}, function(error, remediation) {
+
+        callback(remediation);
+    });
+};
+
+module.exports.updateById = function(id, update, callback) {
+
+    Remediation.findByIdAndUpdate(id, {$set: update}, {},
+        function(error, effected) {
+
+            callback();
+        });
+};

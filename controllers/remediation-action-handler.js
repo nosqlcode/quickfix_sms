@@ -2,6 +2,10 @@
 var multer = require('multer');
 var upload = multer({storage: multer.memoryStorage()});
 
+var remediations = require('../service/remediations');
+var conversations = require('../service/conversations');
+
+var sms = require('../service/sms');
 
 var mongoose = require('mongoose');
 
@@ -42,6 +46,18 @@ module.exports.map = function(app) {
                 }).save();
 
                 resp.render('layouts/thank-you');
+
+                remediations.findByReferenceId(req.params.referenceId,
+                    function(remediation) {
+
+                        conversations.findByCitationNumber(remediation.citationNumber,
+                            function(conversation) {
+
+                                sms.send(conversation.From, remediation.insuranceProvider +
+                                    ' has sent us information related to your citation. ' +
+                                    'This information will be under review by the courts.')
+                            });
+                    });
             });
     });
 

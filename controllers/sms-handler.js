@@ -1,23 +1,13 @@
 
 var twilio = require('twilio');
 
-
-var mongoose = require('mongoose');
-
-var Conversation = mongoose.model('Conversation',
-    {
-        from: String,
-        citationNumber: String,
-        messages: Array,
-        providerOptions: Array,
-        remediation: String
-    });
+var conversations = require('../service/conversations');
 
 var citations = require('./../service/citations');
 var insuranceProviders = require('./../service/insurance-providers');
 
 
-var remediationService = require('../service/remediation-service');
+var remediationService = require('../service/remediations');
 
 
 var emails = require('./../service/emails');
@@ -29,9 +19,9 @@ module.exports = function(req, resp) {
 
     var messageReceived = req.body.Body;
 
-    Conversation.find({from: req.body.From}, function(error, conversations) {
+    conversations.findByFrom(req.body.From, function(conversation) {
 
-        if (conversations.length == 0) {
+        if (conversation) {
 
             citations.findCitation(messageReceived, function(citation) {
 
@@ -47,12 +37,12 @@ module.exports = function(req, resp) {
                         defendant: citation.lastName + ', ' + citation.firstName
                     }, function(remediation) {
 
-                        new Conversation({
+                        conversations.save({
                             from: req.body.From,
                             citationNumber: messageReceived,
                             messages: [messageReceived, response],
                             remediation: remediation._id
-                        }).save();
+                        });
 
                         twiml.message(response);
                         resp.send(twiml.toString());
@@ -129,6 +119,13 @@ var decideResponse = function(conversation, lastMessage, messageReceived, callba
     } else if(contains(lastMessage, 'Please select from the following:')) {
 
         var selection = Number(messageReceived);
+
+        // exit fast
+        if (conversation.providerOptions.length < selection) {
+            callback(selection + ' was not a valid option');
+            return;
+        }
+
         var providerName = conversation.providerOptions[selection - 1];
 
         insuranceProviders.findProviderByName(providerName, function(provider) {
