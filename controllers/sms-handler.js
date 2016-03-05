@@ -21,7 +21,7 @@ module.exports = function(req, resp) {
 
     conversations.findByFrom(req.body.From, function(conversation) {
 
-        if (conversation) {
+        if (!conversation) {
 
             citations.findCitation(messageReceived, function(citation) {
 
@@ -60,10 +60,7 @@ module.exports = function(req, resp) {
 
         } else {
 
-            var conversation = conversations[0];
-
-            var lastMessage = conversation.messages
-                [conversation.messages.length - 1];
+            var lastMessage = conversation.messages[conversation.messages.length - 1];
 
             decideResponse(conversation, lastMessage, messageReceived,
                 function(response) {
