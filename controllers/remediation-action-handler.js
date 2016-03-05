@@ -1,24 +1,61 @@
 
+var multer = require('multer');
+var upload = multer({storage: multer.memoryStorage()});
+
+
 var mongoose = require('mongoose');
 
 var RemediationAction = mongoose.model('RemediationAction', {
     referenceId: String,
     message: String,
-    files: Array
+    fileName: String,
+    mimeType: String,
+    file: String
 });
+
+var RemediationFile = mongoose.model('RemediationFile', {
+    contents: Buffer
+});
+
 
 module.exports.map = function(app) {
 
-    app.post('/remediation-actions/referenceId',
-        function(req, resp) {
+    app.get('/remediation-actions/:referenceId', function(req, resp) {
 
-        new RemediationAction({
-            referenceId: req.params.referenceId,
-            message: req.body.message,
-            files: req.body.files
-        }).save(function(error, remediationsAction) {
-
-            resp.end();
+        resp.render('layouts/remediation-actions',  {
+            referenceId: req.params.referenceId
         });
     });
+
+    app.post('/remediation-actions/:referenceId', upload.single('upload'),
+        function(req, resp) {
+
+        new RemediationFile({contents: req.file.buffer})
+            .save(function(error, remediationFile) {
+
+                new RemediationAction({
+                    referenceId: req.params.referenceId,
+                    message: req.body.message,
+                    fileName: req.file.originalname,
+                    mimeType: req.file.mimetype,
+                    file: remediationFile._id
+                }).save();
+
+                resp.end();
+            });
+    });
+
+    app.get('/remediation-files/:id', function(req, resp) {
+
+        RemediationFile.findById(req.params.id,
+            function(error, remediationFile) {
+
+                resp.writeHead(200, {
+                    'Content-Length': remediationFile.contents.length
+                });
+
+                resp.end(remediationFile.contents);
+            });
+    });
 };
+
