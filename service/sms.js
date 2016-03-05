@@ -8,7 +8,10 @@ module.exports.send = function(to, message) {
         to: to,
         from: '2015618112',
         body: message
-    }, function(err, message) {
-        console.log(message.sid);
+    }, function(error) {
+
+        if (error) {
+            console.log(error);
+        }
     });
 };

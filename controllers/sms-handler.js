@@ -90,7 +90,8 @@ var decideResponse = function(conversation, lastMessage, messageReceived, callba
             callback('Please pay your fine provided by the court, ' +
                 'and purchase auto insurance for future vehicular purposes...');
         }
-    } else if(contains(lastMessage, 'first three letters')) {
+    } else if(contains(lastMessage, 'first three letters') ||
+                contains(lastMessage, 'no Insurance Providers registered')) {
 
         insuranceProviders.findProviders(messageReceived, function(providers) {
 
@@ -114,7 +115,7 @@ var decideResponse = function(conversation, lastMessage, messageReceived, callba
         });
 
     } else if(contains(lastMessage, 'Please select from the following:') ||
-        contains('was not a valid option')) {
+                    contains(lastMessage, 'was not a valid option')) {
 
         var selection = Number(messageReceived);
 
@@ -149,7 +150,7 @@ var decideResponse = function(conversation, lastMessage, messageReceived, callba
                     );
 
                     callback('We have sent a request for your auto insurance ' +
-                        'coverage information to: ' + providerName);
+                        'information to: ' + providerName);
                 });
 
         });

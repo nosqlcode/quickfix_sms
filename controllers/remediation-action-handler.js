@@ -53,7 +53,7 @@ module.exports.map = function(app) {
                         conversations.findByCitationNumber(remediation.citationNumber,
                             function(conversation) {
 
-                                sms.send(conversation.From, remediation.insuranceProvider +
+                                sms.send(conversation.from, remediation.insuranceProvider +
                                     ' has sent us information related to your citation. ' +
                                     'This information will be under review by the courts.')
                             });
