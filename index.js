@@ -7,7 +7,7 @@ var mongoose = require('mongoose');
 mongoose.connect(process.env.MONGOLAB_URI || 'mongodb://localhost/test');
 
 
-app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true}));
 
 
 app.post('/sms', require('./sms-handler'));
