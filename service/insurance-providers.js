@@ -22,3 +22,11 @@ module.exports.findProviderByName = function(name, callback) {
         callback(provider);
     });
 };
+
+module.exports.findById = function(id, callback) {
+
+    InsuranceProvider.findById(id, function(error, provider) {
+
+        callback(provider);
+    });
+};
