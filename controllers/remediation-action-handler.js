@@ -58,7 +58,8 @@ module.exports.map = function(app) {
                         conversations.findByCitationNumber(remediation.citationNumber,
                             function(conversation) {
 
-                                insuranceProviders.findById(id, function(provider) {
+                                insuranceProviders.findById(remediation.insuranceProvider,
+                                    function(provider) {
 
                                     sms.send(conversation.from, provider.name +
                                         ' has sent us information related to your citation. ' +
